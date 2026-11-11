@@ -35,6 +35,7 @@ struct ExperimentalSettingsView: View {
             Toggle("Live TV EPG", isOn: $isVideoPlayerEPGEnabled)
 
             #if os(iOS)
+            PlayerRedesign.SettingsToggle() // REDESIGN: switch between redesigned and original player overlay
             Toggle("Auto switch connection", isOn: $isServerConnectionAutoSwitchEnabled)
             Toggle("Chromecast", isOn: $isChromecastEnabled)
                 .onChange(of: isChromecastEnabled) {

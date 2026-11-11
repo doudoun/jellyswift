@@ -60,7 +60,7 @@ struct VideoPlayer: View {
 
             return Color.black.eraseToAnyView()
         } playbackControls: {
-            PlaybackControls()
+            PlayerRedesign.Controls() // REDESIGN: was `PlaybackControls()`, falls back to it when the redesign is off
         }
         .onAppear {
             if mediaSession.player == nil, mediaSession.state != .stopped {

@@ -137,6 +137,7 @@ extension VideoPlayer {
 
             private var shouldPresentDimOverlay: Bool {
                 !viewState.isTabletop && viewState.visibleElements.contains(.dimming)
+                    && (!PlayerRedesign.isActive || viewState.isPresentingSupplement) // REDESIGN: redesign draws its own scrim
             }
 
             @ContentBuilder
