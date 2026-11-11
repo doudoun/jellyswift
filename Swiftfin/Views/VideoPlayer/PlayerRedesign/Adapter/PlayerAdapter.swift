@@ -37,10 +37,12 @@ extension PlayerRedesign {
 
     struct PillValue {
 
-        /// Short text shown in the pill, e.g. "EN".
-        let short: String
+        /// Short text shown in the pill, e.g. "EN". `nil` shows the icon alone.
+        var short: String?
         /// Long text read by VoiceOver, e.g. "English".
         let spoken: String
+        /// The setting is off (e.g. no subtitles): the icon is shown crossed out.
+        var isOff = false
     }
 
     @MainActor
@@ -340,10 +342,6 @@ extension PlayerRedesign {
             viewState.isVideoEnlarged
         }
 
-        var aspectFillSystemImage: String {
-            isVideoEnlarged ? Tokens.Icons.fit : Tokens.Icons.fill
-        }
-
         func toggleAspectFill() {
             viewState.toggleAspectFillBehavior()
         }
@@ -396,13 +394,13 @@ extension PlayerRedesign {
 
         var subtitleValue: PillValue {
             guard let playbackItem = mediaSession.playbackItem, playbackItem.subtitlesEnabled else {
-                return PillValue(short: Strings.subtitlesOffShort, spoken: Strings.none)
+                return PillValue(short: nil, spoken: Strings.none, isOff: true)
             }
 
             let index = playbackItem.subtitleTrackIndex(secondary: false)
 
             guard let stream = playbackItem.subtitleStreams.first(where: { $0.index == index }) else {
-                return PillValue(short: Strings.subtitlesOffShort, spoken: Strings.none)
+                return PillValue(short: nil, spoken: Strings.none, isOff: true)
             }
 
             return PillValue(short: StreamFormatting.shortLanguage(stream), spoken: StreamFormatting.subtitleTitle(stream))
@@ -623,8 +621,8 @@ extension PlayerRedesign {
         // MARK: - More menu
 
         /// Upstream action buttons that have no dedicated place in the redesign.
-        /// They are shown, untouched, in the "more" menu. The user's own
-        /// bar/menu button configuration is respected.
+        /// They are shown, untouched, in the "more" menu. "Fill screen" always
+        /// comes first; for the others the user's bar/menu configuration is respected.
         var moreActions: [VideoPlayerActionButton] {
             let configured = Defaults[.VideoPlayer.barActionButtons] + Defaults[.VideoPlayer.menuActionButtons]
             let handledByRedesign: Set<VideoPlayerActionButton> = [
@@ -639,11 +637,13 @@ extension PlayerRedesign {
 
             var seen = Set<VideoPlayerActionButton>()
 
-            return configured.filter { button in
+            let others = configured.filter { button in
                 guard !handledByRedesign.contains(button), seen.insert(button).inserted else { return false }
 
                 return isMoreActionAvailable(button)
             }
+
+            return (showsAspectFill ? [.aspectFill] : []) + others
         }
 
         /// Mirrors the filters of upstream `ActionButtons.resolvedActionButtons`.

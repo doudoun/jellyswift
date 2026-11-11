@@ -114,7 +114,8 @@ extension PlayerRedesign {
                 systemImage: systemImage,
                 text: value.short,
                 accessibilityLabel: Strings.pill(title, value: value.spoken),
-                isActive: openPanel == kind
+                isActive: openPanel == kind,
+                isSlashed: value.isOff
             ) {
                 toggle(kind)
             }
@@ -141,14 +142,6 @@ extension PlayerRedesign {
                     pill(.quality, systemImage: Tokens.Icons.quality, title: Strings.quality, value: adapter.qualityValue)
                 }
 
-                if adapter.showsAspectFill {
-                    Pill(
-                        systemImage: adapter.aspectFillSystemImage,
-                        accessibilityLabel: adapter.isVideoEnlarged ? Strings.fitScreen : Strings.fillScreen,
-                        action: adapter.toggleAspectFill
-                    )
-                }
-
                 MoreMenu(adapter: adapter)
             }
         }
@@ -161,33 +154,81 @@ extension PlayerRedesign {
         @Binding
         var openPanel: PanelKind?
 
-        /// Below this width the centred transport would collide with the pills.
-        private static let stackedThreshold: CGFloat = 1000
-
-        @State
-        private var width: CGFloat = .infinity
-
         @ContentBuilder
         var body: some View {
-            Group {
-                if width >= Self.stackedThreshold {
-                    ZStack {
-                        TransportButtons(adapter: adapter)
-
-                        HStack {
-                            Spacer(minLength: 0)
-                            SettingsPills(adapter: adapter, openPanel: $openPanel)
-                        }
-                    }
-                } else {
-                    VStack(spacing: Tokens.Layout.timelineToRowSpacing) {
-                        TransportButtons(adapter: adapter)
-                        SettingsPills(adapter: adapter, openPanel: $openPanel)
-                    }
-                }
+            TransportRowLayout(
+                minimumGap: Tokens.Layout.transportToPillsMinimumGap,
+                stackedSpacing: Tokens.Layout.timelineToRowSpacing
+            ) {
+                TransportButtons(adapter: adapter)
+                SettingsPills(adapter: adapter, openPanel: $openPanel)
             }
             .frame(maxWidth: .infinity)
-            .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = $0 }
+        }
+    }
+
+    /// Places the transport buttons (first subview) and the pills (second subview):
+    /// 1. transport centred, pills trailing, when both fit side by side;
+    /// 2. otherwise the transport slides left to keep `minimumGap` from the pills;
+    /// 3. if the row is still too narrow (Split View, portrait), pills go under the transport.
+    struct TransportRowLayout: Layout {
+
+        var minimumGap: CGFloat
+        var stackedSpacing: CGFloat
+
+        private func sizes(_ subviews: Subviews) -> (transport: CGSize, pills: CGSize) {
+            (subviews[0].sizeThatFits(.unspecified), subviews[1].sizeThatFits(.unspecified))
+        }
+
+        private func fitsOnOneLine(width: CGFloat, transport: CGSize, pills: CGSize) -> Bool {
+            transport.width + minimumGap + pills.width <= width
+        }
+
+        func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+            guard subviews.count == 2 else { return .zero }
+
+            let (transport, pills) = sizes(subviews)
+            let width = proposal.width ?? (transport.width + minimumGap + pills.width)
+
+            if fitsOnOneLine(width: width, transport: transport, pills: pills) {
+                return CGSize(width: width, height: max(transport.height, pills.height))
+            }
+
+            return CGSize(width: width, height: transport.height + stackedSpacing + pills.height)
+        }
+
+        func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+            guard subviews.count == 2 else { return }
+
+            let (transport, pills) = sizes(subviews)
+
+            if fitsOnOneLine(width: bounds.width, transport: transport, pills: pills) {
+                let pillsMinX = bounds.maxX - pills.width
+                let centredX = bounds.midX - transport.width / 2
+                let transportX = max(bounds.minX, min(centredX, pillsMinX - minimumGap - transport.width))
+
+                subviews[0].place(
+                    at: CGPoint(x: transportX, y: bounds.midY),
+                    anchor: .leading,
+                    proposal: ProposedViewSize(transport)
+                )
+                subviews[1].place(
+                    at: CGPoint(x: bounds.maxX, y: bounds.midY),
+                    anchor: .trailing,
+                    proposal: ProposedViewSize(pills)
+                )
+            } else {
+                subviews[0].place(
+                    at: CGPoint(x: bounds.midX, y: bounds.minY),
+                    anchor: .top,
+                    proposal: ProposedViewSize(transport)
+                )
+                subviews[1].place(
+                    at: CGPoint(x: bounds.midX, y: bounds.minY + transport.height + stackedSpacing),
+                    anchor: .top,
+                    proposal: ProposedViewSize(pills)
+                )
+            }
         }
     }
 

@@ -40,9 +40,9 @@ Dossier `Swiftfin/Views/VideoPlayer/PlayerRedesign/` (cible iOS uniquement, sync
 | `Components/Buttons.swift` | Pastille, bouton icône, retour visuel à l'appui. |
 | `Components/TopBar.swift` | Bouton fermer rond, titre, « Saison X · Épisode Y ». |
 | `Components/Timeline.swift` | Temps écoulé / restant, fil, curseur, aperçu au scrub. Le geste est le `SliderContainer` upstream (même scrub lent, mêmes marges tactiles) ; seul le dessin (`TrackStyle`) est nouveau. |
-| `Components/ControlsRow.swift` | Transport (épisode précédent, −15 s, lecture/pause, +15 s, épisode suivant) et pastilles Audio, Sous-titres, Vitesse, Qualité, Remplir l'écran, « ⋯ ». |
+| `Components/ControlsRow.swift` | Transport (épisode précédent, −15 s, lecture/pause, +15 s, épisode suivant) et pastilles Audio, Sous-titres (icône barrée quand ils sont coupés), Vitesse, Qualité, « ⋯ ». `TransportRowLayout` centre le transport quand il y a la place, le décale vers la gauche sinon, et passe les pastilles en dessous si la rangée est trop étroite. |
 | `Components/SettingsPanel.swift` | Panneaux custom ancrés au-dessus de leur pastille (remplacent les `Menu` natifs). |
-| `Components/MoreMenu.swift` | Pastille « ⋯ » : menu natif contenant les boutons upstream sans place dédiée (PiP, verrouillage des gestes, lecture auto, décalages audio / sous-titres, chapitres, Chromecast). |
+| `Components/MoreMenu.swift` | Pastille « ⋯ » : menu natif contenant les boutons upstream sans place dédiée (Remplissage en premier, puis PiP, verrouillage des gestes, lecture auto, décalages audio / sous-titres, chapitres, Chromecast). |
 | `Components/VideoBackdrop.swift` | Voile bas, assombrissement en pause, filet de progression quand les contrôles sont masqués. |
 
 Autres fichiers créés :
@@ -153,11 +153,12 @@ Sur iPad, en paysage, avec un épisode de série qui a plusieurs pistes audio et
 - [ ] −15 s / +15 s ; épisode précédent / suivant (désactivés en début / fin de file).
 - [ ] Glisser sur le fil : curseur agrandi, temps mis à jour, aperçu trickplay (ou puce de temps seule) ; descendre le doigt active le scrub lent ; relâcher reprend à la bonne position.
 - [ ] Pastille Audio : liste des pistes, la sélection change la piste et la pastille (`EN`, `FR`).
-- [ ] Pastille Sous-titres : « Aucun » coupe ; une piste active ; la pastille suit.
+- [ ] Pastille Sous-titres : « Aucun » coupe (icône barrée, sans texte) ; une piste active ; la pastille suit.
 - [ ] Pastille Vitesse : la vitesse change ; « Personnalisée » ouvre l'écran upstream.
 - [ ] Pastille Qualité : débit, résolution (et version si plusieurs) ; la lecture reprend au même endroit.
 - [ ] Un seul panneau ouvert à la fois ; tap à l'extérieur le ferme ; les contrôles ne se masquent pas tant qu'il est ouvert.
-- [ ] Remplir l'écran / adapter.
+- [ ] « ⋯ › Remplissage » : remplir l'écran / adapter.
+- [ ] Sur plusieurs tailles d'iPad et en Split View : le transport ne chevauche jamais les pastilles.
 - [ ] Menu « ⋯ » : PiP, verrouillage des gestes, lecture auto, décalages, chapitres.
 - [ ] Onglets Info / Épisodes sous la rangée ; glisser vers le haut ouvre le tiroir ; le bouton fermer devient une flèche vers le bas.
 - [ ] « Passer l'intro » apparaît au bon endroit.

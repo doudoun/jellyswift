@@ -26,8 +26,6 @@ extension PlayerRedesign {
         static let pause = "Pause"
         static let previousEpisode = "Épisode précédent"
         static let nextEpisode = "Épisode suivant"
-        static let fillScreen = "Remplir l'écran"
-        static let fitScreen = "Adapter à l'écran"
         static let more = "Plus d'options"
 
         static let audio = "Audio"
@@ -36,7 +34,6 @@ extension PlayerRedesign {
         static let quality = "Qualité"
 
         static let none = "Aucun"
-        static let subtitlesOffShort = "Non"
         static let automatic = "Automatique"
         static let automaticShort = "Auto"
         static let maximumShort = "Max"

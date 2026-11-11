@@ -37,6 +37,8 @@ extension PlayerRedesign {
         var text: String?
         let accessibilityLabel: String
         var isActive: Bool = false
+        /// Crosses the icon out, e.g. subtitles off.
+        var isSlashed: Bool = false
         let action: () -> Void
 
         private typealias Colors = Tokens.Colors
@@ -57,6 +59,15 @@ extension PlayerRedesign {
                     Image(systemName: systemImage)
                         .font(.system(size: Size.pillIcon, weight: .medium))
                         .foregroundStyle(isActive ? Colors.accent : Colors.text)
+                        .overlay {
+                            if isSlashed {
+                                Capsule()
+                                    .fill(isActive ? Colors.accent : Colors.text)
+                                    .frame(width: Size.pillSlashWidth, height: Size.pillIcon * 1.35)
+                                    .rotationEffect(.degrees(-45))
+                                    .shadow(color: Colors.background, radius: 0, x: 1, y: 1)
+                            }
+                        }
 
                     if let text {
                         Text(text)

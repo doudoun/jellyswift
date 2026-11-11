@@ -81,6 +81,8 @@ extension PlayerRedesign {
 
             static let groupSpacing: CGFloat = 8
             static let transportSpacing: CGFloat = 20
+            /// Smallest gap kept between the transport buttons and the pills.
+            static let transportToPillsMinimumGap: CGFloat = 24
         }
 
         // MARK: - Sizes
@@ -94,6 +96,7 @@ extension PlayerRedesign {
 
             static let pillHeight: CGFloat = 44
             static let pillIcon: CGFloat = 18
+            static let pillSlashWidth: CGFloat = 2
             static let pillLeadingPadding: CGFloat = 14
             static let pillTrailingPadding: CGFloat = 14
 
@@ -197,8 +200,6 @@ extension PlayerRedesign {
             static let subtitles = "captions.bubble"
             static let speed = "gauge.with.dots.needle.33percent"
             static let quality = "tv"
-            static let fill = "arrow.up.left.and.arrow.down.right"
-            static let fit = "arrow.down.right.and.arrow.up.left"
             static let more = "ellipsis"
             static let checkmark = "checkmark"
         }
