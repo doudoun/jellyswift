@@ -1,3 +1,12 @@
+> [!NOTE]
+> **Jellyswift is an unofficial fork of [Swiftfin](https://github.com/jellyfin/Swiftfin).**
+> It exists to redesign the iPad video player: one grouped bottom overlay, and one-tap panels for audio, subtitles, speed and quality instead of nested menus.
+> The redesign only changes how the player looks. Playback logic stays upstream's, and the fork is regularly rebased on Swiftfin so it keeps getting its updates.
+>
+> - The redesign lives on the [`player-redesign`](https://github.com/doudoun/jellyswift/tree/player-redesign) branch. Architecture and update procedure: [`docs/player-redesign/MAINTENANCE.md`](https://github.com/doudoun/jellyswift/blob/player-redesign/docs/player-redesign/MAINTENANCE.md).
+> - The app is renamed **Jellyswift** and has its own icon, so it is not confused with the official app.
+> - Not affiliated with the Jellyfin project. Please report Jellyswift issues here, not to Swiftfin.
+
 <div align="center">
   <img alt="Swiftfin" src="./Resources/primary-wide.svg">
 
