@@ -37,8 +37,7 @@ enum PlayerRedesign {
         @ContentBuilder
         var body: some View {
             if isEnabled, PlayerRedesign.isSupportedDevice {
-                // Redesigned overlay is plugged in by a later commit.
-                VideoPlayer.PlaybackControls()
+                RedesignedControls()
             } else {
                 VideoPlayer.PlaybackControls()
             }
