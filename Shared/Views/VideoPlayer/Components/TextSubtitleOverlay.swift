@@ -50,7 +50,7 @@ private struct TextSubtitleOverlayContent: View {
     let videoLayout: VideoPlayer.VideoLayout
 
     private var basePointSize: CGFloat {
-        viewLayout.value(standard: 21, large: 36)
+        viewLayout.value(standard: 21, large: 36) * PlayerRedesign.subtitleScale // REDESIGN: user subtitle size
     }
 
     private static var currentSystemStyle: CaptionStyle {

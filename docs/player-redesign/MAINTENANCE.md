@@ -6,7 +6,7 @@ Ce document explique comment la refonte du player vidéo iPad est construite, ce
 
 La refonte est **uniquement visuelle**. Chaque bouton appelle exactement la même fonction upstream que le bouton d'origine. L'état du lecteur, les pistes, la vitesse, la qualité, les épisodes, les gestes et les écrans Info / Épisodes restent gérés par upstream.
 
-Tout le code de la refonte vit dans un dossier séparé. Upstream n'est modifié qu'à trois endroits, avec une ligne chacun, marquée `// REDESIGN:`.
+Tout le code de la refonte vit dans un dossier séparé. Upstream n'est modifié qu'à quatre endroits, avec une ligne chacun, marquée `// REDESIGN:`.
 
 ## Architecture en couches
 
@@ -43,6 +43,8 @@ Dossier `Swiftfin/Views/VideoPlayer/PlayerRedesign/` (cible iOS uniquement, sync
 | `Components/ControlsRow.swift` | Transport (épisode précédent, −15 s, lecture/pause, +15 s, épisode suivant) et pastilles Audio, Sous-titres (icône barrée quand ils sont coupés), Vitesse, Qualité, « ⋯ ». `TransportRowLayout` centre le transport quand il y a la place, le décale vers la gauche sinon, et passe les pastilles en dessous si la rangée est trop étroite. |
 | `Components/SettingsPanel.swift` | Panneaux custom ancrés au-dessus de leur pastille (remplacent les `Menu` natifs). |
 | `Components/MoreMenu.swift` | Pastille « ⋯ » : menu natif contenant les boutons upstream sans place dédiée (Remplissage en premier, puis PiP, verrouillage des gestes, lecture auto, décalages audio / sous-titres, chapitres, Chromecast). |
+| `Components/StepperRow.swift` | Ligne « Taille  [−] 110 % [+] » en bas du panneau Sous-titres. Tap sur la valeur : retour à 100 %. Ne ferme pas le panneau. |
+| `SubtitleScale.swift` | Facteur de taille des sous-titres (50 %–200 %, pas de 10 %), observable et persisté (clé `playerRedesignSubtitleScale`, `UserDefaults(suiteName: "swiftfinApp")`). Exposé à upstream par `PlayerRedesign.subtitleScale` (1 si la refonte est coupée). |
 | `Components/VideoBackdrop.swift` | Voile bas, assombrissement en pause, filet de progression quand les contrôles sont masqués (désactivé par défaut : `Tokens.Options.showsProgressLineWhenHidden`). |
 
 Autres fichiers créés :
@@ -61,6 +63,7 @@ Retrouver toutes les modifications : `git grep -n "REDESIGN:" -- ':!Swiftfin/Vie
 | `Shared/Views/VideoPlayer/VideoPlayer.swift` | `PlaybackControls()` remplacé par `PlayerRedesign.Controls()` | Point d'injection unique de l'overlay. `PlayerRedesign.Controls` affiche l'overlay d'origine quand l'interrupteur est coupé. |
 | `Shared/Views/VideoPlayer/Container/VideoPlayer+Container.swift` | Une condition ajoutée à `shouldPresentDimOverlay` | Upstream assombrit l'image de 50 % dès que les contrôles s'affichent. La refonte dessine son propre voile (dégradé bas, 45 % en pause). L'assombrissement upstream reste actif quand un écran Info / Épisodes est ouvert. |
 | `Shared/Views/SettingsView/ExperimentalSettingsView.swift` | `PlayerRedesign.SettingsToggle()` ajouté dans le bloc iOS | Interrupteur « Nouveau lecteur (iPad) » dans Réglages › Expérimental. |
+| `Shared/Views/VideoPlayer/Components/TextSubtitleOverlay.swift` | `basePointSize` multiplié par `PlayerRedesign.subtitleScale` | Taille des sous-titres texte réglable depuis le panneau Sous-titres, en direct. Si upstream renomme ou déplace `basePointSize`, remettre le multiplicateur sur la taille de base passée à `CaptionText`. |
 
 ### Autres personnalisations du fork (hors refonte)
 
@@ -86,6 +89,8 @@ Ce sont les API qui peuvent casser lors d'une mise à jour. Toutes sont utilisé
 **`MediaPlayerItem`** : `audioStreams`, `selectedAudioStreamIndex`, `subtitleStreams`, `secondarySubtitleStreams`, `subtitlesEnabled`, `subtitleTrackIndex(secondary:)`, `setSubtitleTrack(index:secondary:)`, `setSubtitlesEnabled(_:)`, `supportsSecondarySubtitles`, `configuration.requestedBitrate`, `configuration.maxResolution`, `mediaSource`, `baseItem`, `resumingIntent(at:)`, `previewImageProvider`.
 
 **Vues et types réutilisés** : `VideoPlayerControlsLayout`, `SliderContainer` / `SliderContainerStyle`, `VideoPlayer.UIContainerViewController.SupplementContainerView`, `VideoPlayer.OverlayActions`, `OverlayToastContent`, `VideoPlayer.PlaybackControls.PreviewImageView`, `VideoPlayer.KeyCommandsModifier`, `VideoPlayer.PlaybackControls.Toolbar.ActionButtons.*` (boutons du menu « ⋯ » et `PlaybackSettings.isAvailable(for:)`), `PlaybackAdjustmentSupplement.playbackSpeed(range:)`, `EmptyHitTestView`.
+
+**Sous-titres image** : `MPVMediaPlayer.player` (le `MPVPlayer` de MPVUI) et sa méthode publique `setProperty(_:to:)`, avec la propriété mpv `sub-scale`.
 
 **Réglages** : `Defaults[.VideoPlayer.jumpBackwardInterval]`, `jumpForwardInterval`, `Playback.rates`, `barActionButtons`, `menuActionButtons`, `Experimental.chromecast`.
 
@@ -154,6 +159,7 @@ Sur iPad, en paysage, avec un épisode de série qui a plusieurs pistes audio et
 - [ ] Glisser sur le fil : curseur agrandi, temps mis à jour, aperçu trickplay (ou puce de temps seule) ; descendre le doigt active le scrub lent ; relâcher reprend à la bonne position.
 - [ ] Pastille Audio : liste des pistes, la sélection change la piste et la pastille (`EN`, `FR`).
 - [ ] Pastille Sous-titres : « Aucun » coupe (icône barrée, sans texte) ; une piste active ; la pastille suit.
+- [ ] Panneau Sous-titres › Taille : `+` / `−` changent la taille en direct (sous-titres texte, et image si mpv les met à l'échelle), le % suit, le panneau reste ouvert ; boutons désactivés à 50 % et 200 % ; tap sur le % : 100 % ; taille conservée à l'épisode suivant et après redémarrage.
 - [ ] Pastille Vitesse : la vitesse change ; « Personnalisée » ouvre l'écran upstream.
 - [ ] Pastille Qualité : débit, résolution (et version si plusieurs) ; la lecture reprend au même endroit.
 - [ ] Un seul panneau ouvert à la fois ; tap à l'extérieur le ferme ; les contrôles ne se masquent pas tant qu'il est ouvert.
@@ -185,4 +191,5 @@ Sur iPad, en paysage, avec un épisode de série qui a plusieurs pistes audio et
 - **Scrub** : upstream masque tout sauf la barre pendant le glissement ; la refonte garde l'overlay visible si le glissement part des contrôles (choix visuel, aucun état modifié).
 - **Vitesses** : la liste vient du réglage de l'app, pas d'une liste figée.
 - **Contrôles masqués** : la maquette garde un filet de progression de 4 pt ; il est désactivé par défaut (jugé perturbant à l'usage). Le remettre : `Tokens.Options.showsProgressLineWhenHidden = true`.
+- **Taille des sous-titres** : s'ajoute au style système (Réglages iOS › Accessibilité › Sous-titres), elle ne le remplace pas. Lecteur AVPlayer natif (non par défaut) : non couvert, il dessine ses sous-titres lui-même.
 - **Police** : SF Pro (système) à la place d'Inter. Tailles fixes, pas de Dynamic Type sur l'overlay (place limitée sur la rangée).

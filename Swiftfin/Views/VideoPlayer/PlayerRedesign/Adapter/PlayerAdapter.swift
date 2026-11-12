@@ -474,6 +474,54 @@ extension PlayerRedesign {
             return sections
         }
 
+        // MARK: - Subtitle size
+
+        private var subtitleScale: SubtitleScale {
+            SubtitleScale.shared
+        }
+
+        /// "110 %", locale aware.
+        var subtitleSizeText: String {
+            subtitleScale.value.formatted(.percent.precision(.fractionLength(0)))
+        }
+
+        var canIncreaseSubtitleSize: Bool {
+            subtitleScale.canIncrease
+        }
+
+        var canDecreaseSubtitleSize: Bool {
+            subtitleScale.canDecrease
+        }
+
+        func increaseSubtitleSize() {
+            subtitleScale.increase()
+            applySubtitleScaleToPlayer()
+        }
+
+        func decreaseSubtitleSize() {
+            subtitleScale.decrease()
+            applySubtitleScaleToPlayer()
+        }
+
+        func resetSubtitleSize() {
+            subtitleScale.reset()
+            applySubtitleScaleToPlayer()
+        }
+
+        /// Changes whenever the factor or the playing item changes, to re-apply it to mpv.
+        var subtitleScaleApplicationKey: String {
+            "\(subtitleScale.value)|\(mediaSession.playbackItem?.baseItem.id ?? "")"
+        }
+
+        /// Text subtitles follow `PlayerRedesign.subtitleScale` through the upstream hook.
+        /// Image subtitles (PGS, VobSub) are drawn by mpv, so mpv gets the same factor.
+        func applySubtitleScaleToPlayer() {
+            (mediaSession.player as? MPVMediaPlayer)?.player.setProperty(
+                "sub-scale",
+                to: String(format: "%.2f", locale: Locale(identifier: "en_US_POSIX"), subtitleScale.value)
+            )
+        }
+
         // MARK: - Speed
 
         var showsSpeed: Bool {

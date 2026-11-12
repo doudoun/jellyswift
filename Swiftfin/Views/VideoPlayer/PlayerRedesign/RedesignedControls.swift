@@ -94,6 +94,23 @@ extension PlayerRedesign {
             }
         }
 
+        private func panelFooter(_ kind: PanelKind, adapter: Adapter) -> AnyView? {
+            guard kind == .subtitles else { return nil }
+
+            return AnyView(
+                StepperRow(
+                    title: Strings.subtitleSize,
+                    accessibilityTitle: Strings.subtitleSizeAccessibility,
+                    value: adapter.subtitleSizeText,
+                    canDecrease: adapter.canDecreaseSubtitleSize,
+                    canIncrease: adapter.canIncreaseSubtitleSize,
+                    decrease: adapter.decreaseSubtitleSize,
+                    increase: adapter.increaseSubtitleSize,
+                    reset: adapter.resetSubtitleSize
+                )
+            )
+        }
+
         @ContentBuilder
         private func panelOverlay(anchors: [PanelKind: Anchor<CGRect>], adapter: Adapter) -> some View {
             if let kind = openPanel, let anchor = anchors[kind] {
@@ -119,7 +136,8 @@ extension PlayerRedesign {
                             SettingsPanel(
                                 title: panelTitle(kind),
                                 sections: panelSections(kind, adapter: adapter),
-                                maxHeight: max(Tokens.Size.panelRowDouble * 2, bottom - top)
+                                maxHeight: max(Tokens.Size.panelRowDouble * 2, bottom - top),
+                                footer: panelFooter(kind, adapter: adapter)
                             ) {
                                 openPanel = nil
                             }
@@ -186,6 +204,9 @@ extension PlayerRedesign {
             .animation(Tokens.Motion.controls, value: adapter.isPaused)
             .animation(Tokens.Motion.panel, value: openPanel)
             .animation(.easeInOut(duration: 0.2), value: viewState.toastProxy.isPresenting)
+            .onChange(of: adapter.subtitleScaleApplicationKey, initial: true) {
+                adapter.applySubtitleScaleToPlayer()
+            }
             .onChange(of: openPanel) { _, newValue in
                 adapter.setPanelOpen(newValue != nil)
             }

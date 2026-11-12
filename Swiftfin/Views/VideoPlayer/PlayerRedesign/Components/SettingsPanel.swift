@@ -22,6 +22,8 @@ extension PlayerRedesign {
         let title: String
         let sections: [PanelSection]
         let maxHeight: CGFloat
+        /// Extra content under the options (e.g. subtitle size). Never closes the panel.
+        var footer: AnyView?
         let onSelect: () -> Void
 
         @State
@@ -63,6 +65,15 @@ extension PlayerRedesign {
                             onSelect()
                         }
                     }
+                }
+
+                if let footer {
+                    Divider()
+                        .overlay(Colors.panelBorder)
+                        .padding(.horizontal, Tokens.Padding.panelRowHorizontal)
+                        .padding(.vertical, 6)
+
+                    footer
                 }
             }
             .padding(Tokens.Padding.panel)

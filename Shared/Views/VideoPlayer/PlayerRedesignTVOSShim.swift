@@ -16,6 +16,7 @@ import SwiftUI
 enum PlayerRedesign {
 
     static let isActive = false
+    static let subtitleScale: CGFloat = 1
 
     struct Controls: View {
 

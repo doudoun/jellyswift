@@ -97,6 +97,10 @@ extension PlayerRedesign {
             static let pillHeight: CGFloat = 44
             static let pillIcon: CGFloat = 18
             static let pillSlashWidth: CGFloat = 2
+
+            static let stepperButton: CGFloat = 36
+            static let stepperIcon: CGFloat = 15
+            static let stepperValueWidth: CGFloat = 64
             static let pillLeadingPadding: CGFloat = 14
             static let pillTrailingPadding: CGFloat = 14
 
@@ -202,6 +206,17 @@ extension PlayerRedesign {
             static let quality = "tv"
             static let more = "ellipsis"
             static let checkmark = "checkmark"
+            static let decrease = "minus"
+            static let increase = "plus"
+        }
+
+        // MARK: - Subtitle size
+
+        enum SubtitleSize {
+
+            static let minimum: Double = 0.5
+            static let maximum: Double = 2
+            static let step: Double = 0.1
         }
 
         // MARK: - Options

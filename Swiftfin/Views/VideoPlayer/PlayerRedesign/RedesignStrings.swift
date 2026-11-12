@@ -46,6 +46,11 @@ extension PlayerRedesign {
         static let primaryTrack = "Piste principale"
         static let secondaryTrack = "Piste secondaire"
 
+        static let subtitleSize = "Taille"
+        static let subtitleSizeAccessibility = "Taille des sous-titres"
+        static let decrease = "Réduire"
+        static let increase = "Agrandir"
+
         static func jumpBackward(_ seconds: Int) -> String {
             "Reculer de \(seconds) secondes"
         }
