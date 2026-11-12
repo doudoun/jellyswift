@@ -204,6 +204,15 @@ extension PlayerRedesign {
             static let checkmark = "checkmark"
         }
 
+        // MARK: - Options
+
+        enum Options {
+
+            /// Thin progress line at the bottom of the picture while controls are hidden.
+            /// Off: a hidden overlay leaves the picture completely clean.
+            static let showsProgressLineWhenHidden = false
+        }
+
         // MARK: - Animation
 
         enum Motion {

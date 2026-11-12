@@ -39,7 +39,7 @@ extension PlayerRedesign {
                     .offset(y: proxy.size.height - Tokens.Layout.scrimHeight - belowVideo)
                     .opacity(adapter.showsScrim ? 1 : 0)
 
-                    if adapter.showsHiddenProgress {
+                    if Tokens.Options.showsProgressLineWhenHidden, adapter.showsHiddenProgress {
                         HiddenProgressLine(adapter: adapter)
                             .frame(width: videoFrame.width, height: Tokens.Size.hiddenTrackHeight)
                             .offset(

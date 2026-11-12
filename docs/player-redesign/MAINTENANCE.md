@@ -43,7 +43,7 @@ Dossier `Swiftfin/Views/VideoPlayer/PlayerRedesign/` (cible iOS uniquement, sync
 | `Components/ControlsRow.swift` | Transport (épisode précédent, −15 s, lecture/pause, +15 s, épisode suivant) et pastilles Audio, Sous-titres (icône barrée quand ils sont coupés), Vitesse, Qualité, « ⋯ ». `TransportRowLayout` centre le transport quand il y a la place, le décale vers la gauche sinon, et passe les pastilles en dessous si la rangée est trop étroite. |
 | `Components/SettingsPanel.swift` | Panneaux custom ancrés au-dessus de leur pastille (remplacent les `Menu` natifs). |
 | `Components/MoreMenu.swift` | Pastille « ⋯ » : menu natif contenant les boutons upstream sans place dédiée (Remplissage en premier, puis PiP, verrouillage des gestes, lecture auto, décalages audio / sous-titres, chapitres, Chromecast). |
-| `Components/VideoBackdrop.swift` | Voile bas, assombrissement en pause, filet de progression quand les contrôles sont masqués. |
+| `Components/VideoBackdrop.swift` | Voile bas, assombrissement en pause, filet de progression quand les contrôles sont masqués (désactivé par défaut : `Tokens.Options.showsProgressLineWhenHidden`). |
 
 Autres fichiers créés :
 
@@ -163,7 +163,7 @@ Sur iPad, en paysage, avec un épisode de série qui a plusieurs pistes audio et
 - [ ] Onglets Info / Épisodes sous la rangée ; glisser vers le haut ouvre le tiroir ; le bouton fermer devient une flèche vers le bas.
 - [ ] « Passer l'intro » apparaît au bon endroit.
 - [ ] Pause : image assombrie, contrôles visibles.
-- [ ] Contrôles masqués : filet de progression collé au bas de l'image, qui avance.
+- [ ] Contrôles masqués : plus rien par-dessus l'image (ou, si `showsProgressLineWhenHidden` est activé, un filet collé au bas de l'image qui avance).
 - [ ] Fin d'épisode : passage au suivant (lecture auto).
 - [ ] Fermer le player ; reprise au bon endroit en relançant.
 - [ ] Couper l'interrupteur : l'overlay d'origine revient à l'identique.
@@ -184,4 +184,5 @@ Sur iPad, en paysage, avec un épisode de série qui a plusieurs pistes audio et
 - **Info / Épisodes** : fonctionnement upstream conservé (onglets sous la rangée de contrôles, tiroir qui monte), à la demande de l'utilisateur. Le groupe gauche de la maquette n'est donc pas dessiné.
 - **Scrub** : upstream masque tout sauf la barre pendant le glissement ; la refonte garde l'overlay visible si le glissement part des contrôles (choix visuel, aucun état modifié).
 - **Vitesses** : la liste vient du réglage de l'app, pas d'une liste figée.
+- **Contrôles masqués** : la maquette garde un filet de progression de 4 pt ; il est désactivé par défaut (jugé perturbant à l'usage). Le remettre : `Tokens.Options.showsProgressLineWhenHidden = true`.
 - **Police** : SF Pro (système) à la place d'Inter. Tailles fixes, pas de Dynamic Type sur l'overlay (place limitée sur la rangée).
